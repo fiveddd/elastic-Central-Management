@@ -13,9 +13,8 @@ import ansible_cli_wrapper
 from ansible_cli_wrapper import *
 import cgi
 import os
-import time
 
-app = Flask(__name__)
+app = Flask(__name__, static_folder="frontend/dist", static_url_path='', template_folder="./frontend/dist")
 app.debug = True
 
 TEMP_PATH = './tmp/'

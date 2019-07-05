@@ -17,6 +17,28 @@ const OverView = { template: '<div><h1>Welcome!</h1><p>Here is what site is abou
 
 export default [
   {
+    path: '/',
+    name: '_home',
+    redirect: 'home',
+    component: Main,
+    meta: {
+      hideInMenu: true,
+      notCache: true
+    },
+    children: [
+      {
+        path: '/home',
+        name: 'home',
+        meta: {
+          hideInMenu: true,
+          title: '首页',
+          notCache: true
+        },
+        component: ConfigKibana
+      },
+    ]
+  },
+  {
     path: '/configuration',
     name: '软件升级',
     meta: {
