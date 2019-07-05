@@ -16,13 +16,18 @@
 
 ## 用法
 
+下载：
+```shell
+git clone https://github.com/oldcodeoberyn/elastic-Central-Management.git
+```
+
 注意：目前还属于POC阶段，代码会持续变动。
 
 ### dev
 
 ```shell
+cd elastic-Central-Management
 python3 webservice.py
-
 cd frontend
 npm run dev
 ```
@@ -32,8 +37,8 @@ npm run dev
 ### dev
 
 ```shell
+cd elastic-Central-Management
 python3 webservice.py
-
 cd frontend
 npm run build
 ```
