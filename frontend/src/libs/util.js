@@ -10,11 +10,12 @@ export const checkHTTPStatus = (resp, message, success, failed) => {
   if (!failed) {
     failed = '执行失败，具体原因为：'
   }
+  console.log(resp)
   if (resp.status === 200) {
     message.success(success)
     return true
   } else {
-    message.error(failed + resp.data)
+    message.error(failed + resp.statusText)
     return false
   }
 }

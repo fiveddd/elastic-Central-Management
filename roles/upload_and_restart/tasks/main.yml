@@ -1,0 +1,14 @@
+---
+
+- name: upload etc configuration to server
+  become: yes
+  copy:
+    src: "{{configure_file}}"
+    dest: "{{config_path}}"
+    owner: "{{type}}"
+    group: "{{type}}"
+    mode: 0644
+
+- name: restart service
+  become: yes
+  service: name={{type}} state=restarted enabled=yes

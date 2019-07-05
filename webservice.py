@@ -16,10 +16,7 @@ import os
 
 app = Flask(__name__, static_folder="frontend/dist", static_url_path='', template_folder="./frontend/dist")
 app.debug = True
-
 TEMP_PATH = './tmp/'
-
-TASK_BUFFER = []
 
 
 @app.route('/api/list_invetory', methods=['GET'])
@@ -68,9 +65,6 @@ def download_config():
         host = qp['host'][0]
         task = create_task()
         play_get_etc_config(task, inventory, host, type)
-        TASK_BUFFER.append(task)
-        # print("the new task id is %d" % task['id'])
-        # return jsonify({'id': task['id']})
         return jsonify(task)
     except Exception as e:
         logger.exception(e)
@@ -90,12 +84,10 @@ def fetch_config():
                 fs = f.read()
             return make_response(fs)
         else:
-            return make_response("请求的文件不存在", 400)
-    except Exception as e:
-        return "请求文件时发生异常"
+            return make_response("请求的文件不存在，请重新下载")
     except Exception as e:
         logger.error(e)
-        return make_response("请求异常", 400)
+        return make_response("请求的文件不存在，请重新下载")
 
 
 @app.route('/api/upload_config', methods=['POST'])
@@ -106,33 +98,24 @@ def upload_config():
         type = qp['type'][0]
         host = qp['host'][0]
         inventory = qp['inventory'][0]
+        reset = qp['reset'][0]
         content = request.data
         task = create_task()
-        play_upload_etc_config(task, inventory=inventory, type=type, host=host,
-                               content=content)
-        print("the new task id is %d" % task['id'])
-        return jsonify({'id': task['id']})
+        if reset:
+            result = pb_upload_reset_config(task, inventory=inventory, type=type, host=host,
+                                   content=content)
+        else:
+            result = play_upload_etc_config(task, inventory=inventory, type=type, host=host,
+                                   content=content)
+        if result:
+            return jsonify(task)
+        else:
+            return make_response("异常", 500)
 
     except Exception as e:
         logger.exception(e)
-        return make_response("请求异常", 400)
+        return make_response("请求异常", 204)
 
-
-@app.route('/api/get_task', methods=['GET'])
-def get_task():
-    qs = str(request.query_string, encoding='utf-8')
-    try:
-        qp = cgi.urllib.parse.parse_qs(qs)
-        task_id = qp['id'][0]
-        print('the query id is %s' % task_id)
-        for task in TASK_BUFFER:
-            print(task['id'])
-            if task['id'] == int(task_id):
-                return jsonify(task)
-        return make_response("not found", 204)
-    except Exception as e:
-        logger.error(e)
-        return make_response("请求异常", 400)
 
 
 @app.route('/', methods=['GET', 'POST'])

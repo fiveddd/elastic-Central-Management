@@ -126,9 +126,9 @@ def runansible(task, inventory, host_list, task_list, remote_user=None, become_u
             tqm.cleanup()
 
 
-def run_playbook(task, host_file='hosts_dev', play_book='fetch_config.yml'):
+def run_playbook(task, inventory='hosts_dev', play_book='fetch_config.yml'):
     try:
-        cli = PlaybookCLI([" ", '-i', INVENTORY_PATH + host_file, play_book])
+        cli = PlaybookCLI([" ", '-i', INVENTORY_PATH + inventory, play_book])
 
         super(PlaybookCLI, cli).run()
 
@@ -150,13 +150,6 @@ def run_playbook(task, host_file='hosts_dev', play_book='fetch_config.yml'):
 
 def pb_get_inventory(host_file='hosts_dev', type=None):
     try:
-        # cli = PlaybookCLI([" ", '-i', INVENTORY_PATH + host_file, "fake"])
-        #
-        # super(PlaybookCLI, cli).run()
-        #
-        # loader, inventory, variable_manager = cli._play_prereqs()
-        #
-        # CLI.get_host_list(inventory, context.CLIARGS['subset'])
         loader = DataLoader()
         inventory = InventoryManager(loader=loader, sources=[INVENTORY_PATH + host_file])
         groups = inventory.groups
@@ -193,12 +186,23 @@ def play_upload_etc_config(task, inventory, host, type, content):
     with open(file_path, 'wb') as f:
         f.write(content)
     tasks_list = [
-        dict(action=dict(module='command', args='whoami')),
         dict(action=dict(module='copy',
                          args='src=%s dest=%s owner=%s group=%s mode=0644' % (file_path, config_path, type, type))),
     ]
     return runansible(task, INVENTORY_PATH + inventory, [host], tasks_list, remote_user='jboss', become_user=type)
 
+def pb_upload_reset_config(task, inventory, host, type, content):
+    config_path = '/etc/{}/{}.yml'.format(type, type)
+    file_path = './tmp/%s-%s' % (type, host)
+    with open(file_path, 'wb') as f:
+        f.write(content)
+    with open('./playbook_template/upload_and_restart.yml', 'r') as t:
+        template = t.read()
+    with open('./upload_and_restart.yml', 'w') as pb:
+        pb_content = template % (host, file_path, config_path, type)
+        print(pb_content)
+        pb.write(pb_content)
+    return run_playbook(task, inventory, 'upload_and_restart.yml')
 
 if __name__ == '__main__':
     play_get_etc_config(create_task(), 'hosts.uat', 'kibana_all', 'kibana')

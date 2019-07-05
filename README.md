@@ -23,6 +23,31 @@ git clone https://github.com/oldcodeoberyn/elastic-Central-Management.git
 
 注意：目前还属于POC阶段，代码会持续变动。
 
+要使用该程序，首先需要添加合适的inventory文件到`/inventory`目录, 文件内容包含你elastic集群的机器：
+
+```
+[all:vars]
+ansible_ssh_private_key_file=~/.ssh/id_rsa
+ansible_user=root
+ansible_port=22
+
+[kibana]
+kibana_1 ansible_host=39.105.128.88
+
+[elasticsearch]
+elasticsearch_master ansible_host=39.105.128.66
+elasticsearch_data_1 ansible_host=39.105.128.67
+elasticsearch_data_2 ansible_host=39.105.128.68
+
+[logstash]
+logstash_1 ansible_host=39.105.128.90
+logstash_2 ansible_host=39.105.128.91
+
+[filebeat]
+filebeat_[1:100] ansible_host=39.105.128.[1:100]
+
+```
+
 ### dev
 
 ```shell

@@ -3,20 +3,28 @@
         <Tabs :value="inventoryName" @on-click="get_inventory">
             <TabPane :label="infor" v-for="(infor, i) in inventoryList" :key="`infor-${i}`" :name="infor">
                 <Card :bordered="false" v-for="(hosts, group) in inventoryData" :key="group">
-                    <p slot="title" style="height: 35px">{{group}} <Button type="circle" icon="md-download" @click="download_config(group)"></Button></p>
-                    <Button type="primary" @click="get_config(host.name)" shape="circle" icon="md-laptop" v-for="(host,i) in hosts" :key="i" >{{host.name}}</Button>
+                    <p slot="title" style="height: 35px">{{group}}
+                        <Button type="circle" icon="md-download" @click="download_config(group)"></Button>
+                    </p>
+                    <Button type="primary" @click="get_config(host.name)" shape="circle" icon="md-laptop"
+                            v-for="(host,i) in hosts" :key="i">{{host.name}}
+                    </Button>
                 </Card>
             </TabPane>
         </Tabs>
-        <Drawer title="运行状态" :closable="false" v-model="showStatusDrawer">
-            <div v-html="runningStatus"></div>
+        <Drawer title="运行状态" :closable="false" v-model="showStatusDrawer" width="360">
+            <div v-html="runningStatus">
+                <Icon type="ios-loading"/>
+            </div>
             <div v-html="runningResult"></div>
         </Drawer>
-        <Drawer :title="selectedHost+' : '+componentType+'.yml'" :closable="false" placement="left" width="800" v-model="showContentDrawer">
-            <editor v-model="configurationContent" @init="editorInit" lang="yaml" theme="chrome" width="100%" height="70%"></editor>
+        <Drawer :title="selectedHost+' : '+componentType+'.yml'" :closable="false" placement="left" width="800"
+                v-model="showContentDrawer">
+            <editor v-model="configurationContent" @init="editorInit" lang="yaml" theme="chrome" width="100%"
+                    height="70%"></editor>
             <div class="demo-drawer-footer">
-                <Button style="margin-right: 8px" @click="upload_config">上传</Button>
-                <Button type="primary" @click="value3 = false">上传并重启</Button>
+                <Button style="margin-right: 8px" @click="upload_config(false)">上传</Button>
+                <Button type="primary" @click="upload_config(true)">上传并重启</Button>
             </div>
         </Drawer>
     </div>
@@ -25,7 +33,7 @@
 <script>
 /* eslint-disable */
     import {listInventory, getInventory} from '@/api/inventory'
-    import {downloadConfig, getConfig, uploadConfig, getTask} from '@/api/configuration'
+    import {downloadConfig, getConfig, uploadConfig, uploadResetConfig, getTask} from '@/api/configuration'
     import {checkHTTPStatus} from '@/libs/util'
     export default {
       name: 'configuration',
@@ -42,9 +50,9 @@
           showContentDrawer: false,
           taskId: 0,
           runningStatus: "",
-          runningResult:"",
+          runningResult: "",
           inventoryName: "",
-          configurationContent:"",
+          configurationContent: "",
           hostName: "",
           inventoryList: [],
           inventoryData: []
@@ -68,67 +76,66 @@
         },
         get_inventory(inventoryName) {
           this.inventoryName = inventoryName
-          getInventory(inventoryName,this.componentType).then(data => {
+          getInventory(inventoryName, this.componentType).then(data => {
             this.inventoryData = data.data
           })
-        },
-        trace_task(id){
-          this.taskId = id
-          setTimeout(()=>{
-            getTask(this.taskId).then(data => {
-              if(data.status == 200)
-              {
-                let result = data.data
-                this.runningStatus = `<p style="color: #19be6b">${data.data.status}</p>`
-                for(let k in result.message){
-                  this.runningResult += result.message[k]
-                }
-
-              }
-              else{
-                this.runningStatus = '未知错误'
-              }
-
-            }).catch((e)=>{
-              console.log(e)
-            })
-          },500)
         },
         download_config(group) {
           this.showStatusDrawer = true;
           this.runningStatus = "开始运行任务"
-          this.runningResult = '<Icon type="ios-loading" />'
+          this.runningResult = ""
           this.hostName = group
+          this.$Spin.show()
           downloadConfig(this.hostName, this.componentType, this.inventoryName).then(data => {
-            if(checkHTTPStatus(data,this.$Message)){
+            this.$Spin.hide()
+            if (checkHTTPStatus(data, this.$Message)) {
               let result = data.data
-              this.runningStatus = `<p style="color: #19be6b">${data.data.status}</p>`
-              for(let k in result.message){
+              this.runningStatus = ""
+              for (let k in result.message) {
                 this.runningResult += result.message[k]
               }
-            }else {
+            } else {
               this.showStatusDrawer = false
             }
-          }).catch((e)=>{
+          }).catch((e) => {
             console.log(e)
           })
         },
         get_config(hostName){
           this.showContentDrawer = true
           this.selectedHost = hostName
-          getConfig(hostName,this.componentType).then(data => {
+          getConfig(hostName, this.componentType).then(data => {
             this.configurationContent = data.data
-          }).catch((e)=>{
+          }).catch((e) => {
             console.log(e)
           })
 
         },
-        upload_config(){
-          uploadConfig(this.componentType, this.selectedHost, this.inventoryName, this.configurationContent).then(data => {
-          }).catch(e=>console.log(e))
+        upload_config(reset){
+          this.showStatusDrawer = true;
+          this.$Spin.show()
+          this.runningStatus = "开始运行任务"
+          this.runningResult = ""
+          uploadConfig(this.componentType, this.selectedHost, this.inventoryName, this.configurationContent, reset).then(data => {
+            this.$Spin.hide()
+            if (checkHTTPStatus(data, this.$Message)) {
+              let result = data.data
+              this.runningStatus = ""
+              for (let k in result.message) {
+                this.runningResult += result.message[k]
+              }
+            } else {
+              this.showStatusDrawer = false
+            }
+          }).catch(
+            e => {
+              this.$Spin.hide()
+              this.$Message.error(e)
+            })
 
         },
-        clearTimer(){}
+        clearTimer(){
+        }
 
       }
 
@@ -136,7 +143,7 @@
 </script>
 
 <style>
-    .demo-drawer-footer{
+    .demo-drawer-footer {
         width: 100%;
         position: absolute;
         bottom: 0;

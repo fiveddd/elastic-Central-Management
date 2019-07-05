@@ -27,14 +27,15 @@ export const getConfig = (filename, type) => {
   })
 }
 
-export const uploadConfig = (type, host, inventory, content) => {
+export const uploadConfig = (type, host, inventory, content, reset) => {
   return httpRequest.request({
     url: '/api/upload_config',
     method: 'post',
     params: {
       type,
       inventory,
-      host
+      host,
+      reset
     },
     data: content
   })

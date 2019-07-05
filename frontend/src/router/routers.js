@@ -2,6 +2,7 @@ import Main from '@/view/main'
 import ConfigKibana from '@/view/system-config/config-kibana.vue'
 import ConfigElasticsearch from '@/view/system-config/config-elasticsearch.vue'
 import ConfigLogstash from '@/view/system-config/config-logstash.vue'
+import ConfigFilebeat from '@/view/system-config/config-filebeat.vue'
 
 /**
  * iview-admin中meta除了原生参数外可配置的参数:
@@ -40,93 +41,93 @@ export default [
   },
   {
     path: '/configuration',
-    name: '软件升级',
+    name: '配置更新',
     meta: {
       icon: "md-construct",
-      title: '配置升级'
+      title: '配置更新'
     },
     component: Main,
     children: [
       {
         path: '/kibana',
-        name: 'kibana升级',
+        name: 'kibana配置更新',
         meta: {
           icon: 'md-menu',
-          title: 'kibana升级'
+          title: 'kibana配置更新'
         },
         component: ConfigKibana
       },
       {
         path: '/elasticsearch',
-        name: 'elasticsearch升级',
+        name: 'elasticsearch配置更新',
         meta: {
           icon: 'md-menu',
-          title: 'elasticsearch升级'
+          title: 'elasticsearch配置更新'
         },
         component: ConfigElasticsearch
       },
       {
         path: '/logstash',
-        name: 'logstash升级',
+        name: 'logstash配置更新',
         meta: {
           icon: 'md-menu',
-          title: 'logstash升级'
+          title: 'logstash配置更新'
         },
         component: ConfigLogstash
       },
       {
         path: '/filebeat',
-        name: 'filebeat升级',
+        name: 'filebeat配置更新',
         meta: {
           icon: 'md-menu',
-          title: 'filebeat升级'
+          title: 'filebeat配置更新'
         },
-        component: ConfigLogstash
+        component: ConfigFilebeat
       }
     ]
   },
   {
     path: '/configuration',
-      name: '配置升级',
+      name: '软件更新',
     meta: {
     icon: "md-construct",
-      title: '配置升级'
+      title: '软件更新'
   },
     component: Main,
       children: [
         {
           path: '/kibana',
-          name: 'kibana配置升级',
+          name: 'kibana软件更新',
           meta: {
             icon: 'md-menu',
-            title: 'kibana配置升级'
+            title: 'kibana软件更新'
           },
           component: ConfigKibana
         },
         {
           path: '/elasticsearch',
-          name: 'elasticsearch配置升级',
+          name: 'elasticsearch软件更新',
           meta: {
             icon: 'md-menu',
-            title: 'elasticsearch配置升级'
+            title: 'elasticsearch软件更新'
           },
           component: ConfigElasticsearch
         },
         {
           path: '/logstash',
-          name: 'logstash配置升级',
+          name: 'logstash软件更新',
           meta: {
             icon: 'md-menu',
-            title: 'logstash配置升级'
+            title: 'logstash软件更新'
           },
           component: ConfigLogstash
         },
         {
           path: '/filebeat',
-          name: 'filebeat配置升级',
+          name: 'filebeat软件更新',
           meta: {
             icon: 'md-menu',
-            title: 'filebeat配置升级'
+            title: 'filebeat软件更新'
           },
           component: ConfigLogstash
         }
