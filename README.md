@@ -12,6 +12,7 @@
 
 该项目采用前后端分离的方式，前端使用了iview admin，后端使用了python + ansible
 
+![在这里插入图片描述](https://img-blog.csdnimg.cn/20190705105607572.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9sZXgtbGVlLmJsb2cuY3Nkbi5uZXQ=,size_16,color_FFFFFF,t_70)
 
 ## 用法
 
