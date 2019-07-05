@@ -70,5 +70,9 @@ npm run build
 
 然后访问 http://localhost:3389/
 
+### 示例
+
+![在这里插入图片描述](https://img-blog.csdnimg.cn/20190705161221119.gif)
+
 
 
