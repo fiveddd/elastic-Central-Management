@@ -33,13 +33,11 @@ def list_invetory():
 @app.route('/api/get_invetory', methods=['GET'])
 def get_invetory():
     importlib.reload(ansible_cli_wrapper)
-    qs = str(request.query_string, encoding='utf-8')
-
     try:
-        qp = cgi.urllib.parse.parse_qs(qs)
-        filename = qp['name'][0]
-        type = qp['type'][0]
-        result = pb_get_inventory(host_file=filename, type=type)
+        args = request.args
+        filename = args['name']
+        category = args['type']
+        result = pb_get_inventory(host_file=filename, type=category)
         return jsonify(result)
     except Exception as e:
         return jsonify(pb_get_inventory())
@@ -59,10 +57,10 @@ def list_config():
 def download_config():
     qs = str(request.query_string, encoding='utf-8')
     try:
-        qp = cgi.urllib.parse.parse_qs(qs)
-        inventory = qp['inventory'][0]
-        type = qp['type'][0]
-        host = qp['host'][0]
+        args = request.args
+        inventory = args['inventory']
+        type = args['type']
+        host = args['host']
         task = create_task()
         play_get_etc_config(task, inventory, host, type)
         return jsonify(task)
@@ -75,9 +73,9 @@ def download_config():
 def fetch_config():
     qs = str(request.query_string, encoding='utf-8')
     try:
-        qp = cgi.urllib.parse.parse_qs(qs)
-        filename = qp['filename'][0]
-        type = qp['type'][0]
+        args = request.args
+        filename = args['filename']
+        type = args['type']
         if filename and type:
 
             with open('./tmp/' + type + '-' + filename, 'r') as f:
@@ -95,10 +93,11 @@ def upload_config():
     qs = str(request.query_string, encoding='utf-8')
     try:
         qp = cgi.urllib.parse.parse_qs(qs)
-        type = qp['type'][0]
-        host = qp['host'][0]
-        inventory = qp['inventory'][0]
-        reset = qp['reset'][0]
+        args = request.args
+        type = args['type']
+        host = args['host']
+        inventory = args['inventory']
+        reset = args['reset']
         content = request.data
         task = create_task()
         if reset:
