@@ -3,16 +3,14 @@
 # @Time    : 2019/6/26 4:31 PM
 # @Author  : lij021
 # @File    : webservice.py
-import importlib
+import os
 
 from flask import Flask, render_template, request, jsonify
 from flask import make_response
 from flask_cors import CORS
 
-import ansible_cli_wrapper
 from ansible_cli_wrapper import *
-import cgi
-import os
+
 
 app = Flask(__name__, static_folder="frontend/dist", static_url_path='', template_folder="./frontend/dist")
 app.debug = True
@@ -32,7 +30,6 @@ def list_invetory():
 
 @app.route('/api/get_invetory', methods=['GET'])
 def get_invetory():
-    importlib.reload(ansible_cli_wrapper)
     try:
         args = request.args
         filename = args['name']
@@ -92,7 +89,6 @@ def fetch_config():
 def upload_config():
     qs = str(request.query_string, encoding='utf-8')
     try:
-        qp = cgi.urllib.parse.parse_qs(qs)
         args = request.args
         type = args['type']
         host = args['host']
