@@ -68,7 +68,6 @@ def download_config():
 
 @app.route('/api/get_config', methods=['GET'])
 def fetch_config():
-    qs = str(request.query_string, encoding='utf-8')
     try:
         args = request.args
         filename = args['filename']
@@ -87,7 +86,6 @@ def fetch_config():
 
 @app.route('/api/upload_config', methods=['POST'])
 def upload_config():
-    qs = str(request.query_string, encoding='utf-8')
     try:
         args = request.args
         type = args['type']
