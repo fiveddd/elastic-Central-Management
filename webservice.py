@@ -3,16 +3,14 @@
 # @Time    : 2019/6/26 4:31 PM
 # @Author  : lij021
 # @File    : webservice.py
-import importlib
+import os
 
 from flask import Flask, render_template, request, jsonify
 from flask import make_response
 from flask_cors import CORS
 
-import ansible_cli_wrapper
 from ansible_cli_wrapper import *
-import cgi
-import os
+
 
 app = Flask(__name__, static_folder="frontend/dist", static_url_path='', template_folder="./frontend/dist")
 app.debug = True
@@ -32,14 +30,11 @@ def list_invetory():
 
 @app.route('/api/get_invetory', methods=['GET'])
 def get_invetory():
-    importlib.reload(ansible_cli_wrapper)
-    qs = str(request.query_string, encoding='utf-8')
-
     try:
-        qp = cgi.urllib.parse.parse_qs(qs)
-        filename = qp['name'][0]
-        type = qp['type'][0]
-        result = pb_get_inventory(host_file=filename, type=type)
+        args = request.args
+        filename = args['name']
+        category = args['type']
+        result = pb_get_inventory(host_file=filename, type=category)
         return jsonify(result)
     except Exception as e:
         return jsonify(pb_get_inventory())
@@ -59,10 +54,10 @@ def list_config():
 def download_config():
     qs = str(request.query_string, encoding='utf-8')
     try:
-        qp = cgi.urllib.parse.parse_qs(qs)
-        inventory = qp['inventory'][0]
-        type = qp['type'][0]
-        host = qp['host'][0]
+        args = request.args
+        inventory = args['inventory']
+        type = args['type']
+        host = args['host']
         task = create_task()
         play_get_etc_config(task, inventory, host, type)
         return jsonify(task)
@@ -73,11 +68,10 @@ def download_config():
 
 @app.route('/api/get_config', methods=['GET'])
 def fetch_config():
-    qs = str(request.query_string, encoding='utf-8')
     try:
-        qp = cgi.urllib.parse.parse_qs(qs)
-        filename = qp['filename'][0]
-        type = qp['type'][0]
+        args = request.args
+        filename = args['filename']
+        type = args['type']
         if filename and type:
 
             with open('./tmp/' + type + '-' + filename, 'r') as f:
@@ -92,13 +86,12 @@ def fetch_config():
 
 @app.route('/api/upload_config', methods=['POST'])
 def upload_config():
-    qs = str(request.query_string, encoding='utf-8')
     try:
-        qp = cgi.urllib.parse.parse_qs(qs)
-        type = qp['type'][0]
-        host = qp['host'][0]
-        inventory = qp['inventory'][0]
-        reset = qp['reset'][0]
+        args = request.args
+        type = args['type']
+        host = args['host']
+        inventory = args['inventory']
+        reset = args['reset']
         content = request.data
         task = create_task()
         if reset:
