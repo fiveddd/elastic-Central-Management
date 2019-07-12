@@ -11,7 +11,6 @@ from flask_cors import CORS
 
 from ansible_cli_wrapper import *
 
-
 app = Flask(__name__, static_folder="frontend/dist", static_url_path='', template_folder="./frontend/dist")
 app.debug = True
 TEMP_PATH = './tmp/'
@@ -73,7 +72,6 @@ def fetch_config():
         filename = args['filename']
         type = args['type']
         if filename and type:
-
             with open('./tmp/' + type + '-' + filename, 'r') as f:
                 fs = f.read()
             return make_response(fs)
@@ -91,15 +89,13 @@ def upload_config():
         type = args['type']
         host = args['host']
         inventory = args['inventory']
-        reset = args['reset']
+        reset = 'updateOnly' in args.keys()
+        template = 'template' in args.keys()
         content = request.data
         task = create_task()
-        if reset:
-            result = pb_upload_reset_config(task, inventory=inventory, type=type, host=host,
-                                   content=content)
-        else:
-            result = play_upload_etc_config(task, inventory=inventory, type=type, host=host,
-                                   content=content)
+        result = pb_upload_reset_config(task, inventory=inventory, type=type, host=host,
+                                        content=content, update_only=reset, use_template=template)
+
         if result:
             return jsonify(task)
         else:
@@ -107,8 +103,38 @@ def upload_config():
 
     except Exception as e:
         logger.exception(e)
-        return make_response("请求异常", 204)
+        return make_response("请求异常", 400)
 
+
+@app.route('/api/config/list_template', methods=['GET'])
+def list_config_template():
+    try:
+        args = request.args
+        config_type = args['type']
+        templates = os.listdir("./roles/upload_and_restart/templates")
+        result = []
+        for t in templates:
+            if config_type in t:
+                result.append(t)
+        return jsonify(result)
+    except Exception as e:
+        return make_response(e)
+
+
+@app.route('/api/config/get_template', methods=['GET'])
+def get_config_template():
+    try:
+        args = request.args
+        filename = args['filename']
+        if filename and type:
+            with open('./roles/upload_and_restart/templates/' + filename, 'r') as f:
+                fs = f.read()
+            return make_response(fs)
+        else:
+            return make_response("请求的文件不存在")
+    except Exception as e:
+        logger.error(e)
+        return make_response("请求的文件不存在")
 
 
 @app.route('/', methods=['GET', 'POST'])

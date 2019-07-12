@@ -3,6 +3,7 @@ import ConfigKibana from '@/view/system-config/config-kibana.vue'
 import ConfigElasticsearch from '@/view/system-config/config-elasticsearch.vue'
 import ConfigLogstash from '@/view/system-config/config-logstash.vue'
 import ConfigFilebeat from '@/view/system-config/config-filebeat.vue'
+import parentView from '@/components/parent-view'
 
 /**
  * iview-admin中meta除了原生参数外可配置的参数:
@@ -41,10 +42,10 @@ export default [
   },
   {
     path: '/configuration',
-    name: '配置更新',
+    name: 'elastic配置更新',
     meta: {
       icon: "md-construct",
-      title: '配置更新'
+      title: 'elastic配置更新'
     },
     component: Main,
     children: [
@@ -73,7 +74,33 @@ export default [
           icon: 'md-menu',
           title: 'logstash配置更新'
         },
-        component: ConfigLogstash
+        component: parentView,
+        children: [
+          {
+            path: '/configuration/logstash/etc',
+            name: 'logstash etc 配置更新',
+            meta: {
+              icon: 'md-menu',
+              title: 'logstash etc 配置更新'
+            },
+            component: ConfigKibana
+          },{
+            path: '/configuration/logstash/etc',
+            name: 'logstash pattern 配置更新',
+            meta: {
+              icon: 'md-menu',
+              title: 'logstash etc 配置更新'
+            },
+            component: ConfigKibana
+          },{
+            path: '/configuration/logstash/etc',
+            name: 'logstash pipeline 配置更新',
+            meta: {
+              icon: 'md-menu',
+              title: 'logstash pipeline 配置更新'
+            },
+            component: ConfigKibana
+          }]
       },
       {
         path: '/filebeat',
@@ -88,10 +115,10 @@ export default [
   },
   {
     path: '/configuration',
-      name: '软件更新',
+      name: 'elastic软件更新',
     meta: {
     icon: "md-construct",
-      title: '软件更新'
+      title: 'elastic软件更新'
   },
     component: Main,
       children: [
@@ -129,16 +156,103 @@ export default [
             icon: 'md-menu',
             title: 'filebeat软件更新'
           },
-          component: ConfigLogstash
+          component: ConfigFilebeat
         }
       ]
   },
-
+  {
+    path: '/apm',
+    name: 'APM',
+    meta: {
+      icon: "md-construct",
+      title: 'APM'
+    },
+    component: Main,
+    children: [
+      {
+        path: '/apm/deploy',
+        name: 'APM客户端部署',
+        meta: {
+          icon: 'md-menu',
+          title: 'APM客户端部署'
+        },
+        component: ConfigKibana
+      },
+      {
+        path: '/apm/configuration',
+        name: 'APM配置更新',
+        meta: {
+          icon: 'md-menu',
+          title: 'APM配置更新'
+        },
+        component: ConfigElasticsearch
+      }
+    ]
+  },
+  {
+    path: '/kafka',
+    name: 'kafka',
+    meta: {
+      icon: "md-construct",
+      title: 'kafka'
+    },
+    component: Main,
+    children: [
+      {
+        path: '/kafka/deploy',
+        name: 'kafka部署',
+        meta: {
+          icon: 'md-menu',
+          title: 'kafka部署'
+        },
+        component: ConfigKibana
+      },
+      {
+        path: '/kafka/configuration',
+        name: 'kafka配置更新',
+        meta: {
+          icon: 'md-menu',
+          title: 'kafka配置更新'
+        },
+        component: ConfigElasticsearch
+      }
+    ]
+  },
+  {
+    path: '/zookeeper',
+    name: 'zookeeper',
+    meta: {
+      icon: "md-construct",
+      title: 'zookeeper'
+    },
+    component: Main,
+    children: [
+      {
+        path: '/zookeeper/deploy',
+        name: 'zookeeper部署',
+        meta: {
+          icon: 'md-menu',
+          title: 'zookeeper部署'
+        },
+        component: ConfigKibana
+      },
+      {
+        path: '/zookeeper/configuration',
+        name: 'zookeeper配置更新',
+        meta: {
+          icon: 'md-menu',
+          title: 'zookeeper配置更新'
+        },
+        component: ConfigElasticsearch
+      }
+    ]
+  },
   {
     path: '/overview',
     name: 'overview',
     component: OverView
   },
+
   {    path: '/configuration',
     name: '一键破解',
     meta: {

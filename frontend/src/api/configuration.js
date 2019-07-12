@@ -27,7 +27,7 @@ export const getConfig = (filename, type) => {
   })
 }
 
-export const uploadConfig = (type, host, inventory, content, reset) => {
+export const uploadConfig = (type, host, inventory, content, updateOnly, template) => {
   return httpRequest.request({
     url: '/api/upload_config',
     method: 'post',
@@ -35,7 +35,8 @@ export const uploadConfig = (type, host, inventory, content, reset) => {
       type,
       inventory,
       host,
-      reset
+      updateOnly,
+      template
     },
     data: content
   })
@@ -45,9 +46,25 @@ export const getTask = (id) => {
   return httpRequest.request({
     url: '/api/get_task',
     method: 'get',
-    params: {"id": id}
+    params: {id}
   })
 }
 
+
+export const listTemplate = (type) => {
+  return httpRequest.request({
+    url: '/api/config/list_template',
+    method: 'get',
+    params: {type}
+  })
+}
+
+export const getTemplate = (filename) => {
+  return httpRequest.request({
+    url: '/api/config/get_template',
+    method: 'get',
+    params: {filename}
+  })
+}
 
 

@@ -2,6 +2,7 @@
 
 - name: upload etc configuration to server
   become: yes
+  when: not use_template
   copy:
     src: "{{configure_file}}"
     dest: "{{config_path}}"
@@ -9,6 +10,17 @@
     group: "{{type}}"
     mode: 0644
 
+
+- name: upload etc configuration to server with template
+  become: yes
+  when: use_template
+  template:
+    src: "{{configure_file}}"
+    dest: "{{config_path}}"
+    owner: "{{type}}"
+    group: "{{type}}"
+    mode: 0644
 - name: restart service
   become: yes
+  when: not upload_only
   service: name={{type}} state=restarted enabled=yes

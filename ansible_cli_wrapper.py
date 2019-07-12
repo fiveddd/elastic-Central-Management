@@ -191,7 +191,8 @@ def play_upload_etc_config(task, inventory, host, type, content):
     ]
     return runansible(task, INVENTORY_PATH + inventory, [host], tasks_list, remote_user='jboss', become_user=type)
 
-def pb_upload_reset_config(task, inventory, host, type, content):
+
+def pb_upload_reset_config(task, inventory, host, type, content, update_only, use_template):
     config_path = '/etc/{}/{}.yml'.format(type, type)
     file_path = './tmp/%s-%s' % (type, host)
     with open(file_path, 'wb') as f:
@@ -199,7 +200,7 @@ def pb_upload_reset_config(task, inventory, host, type, content):
     with open('./playbook_template/upload_and_restart.yml', 'r') as t:
         template = t.read()
     with open('./upload_and_restart.yml', 'w') as pb:
-        pb_content = template % (host, file_path, config_path, type)
+        pb_content = template % (host, file_path, config_path, type, update_only, use_template)
         print(pb_content)
         pb.write(pb_content)
     return run_playbook(task, inventory, 'upload_and_restart.yml')
