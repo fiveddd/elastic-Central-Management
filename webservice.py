@@ -4,6 +4,10 @@
 # @Author  : lij021
 # @File    : webservice.py
 import os
+import functools
+import logging
+from logging.handlers import RotatingFileHandler
+
 
 from flask import Flask, render_template, request, jsonify
 from flask import make_response
@@ -16,7 +20,56 @@ app.debug = True
 TEMP_PATH = './tmp/'
 
 
+def configure_logger(app):
+    logs_folder = app.config.get('LOG_PATH')
+    if not logs_folder:
+        logs_folder = os.getcwd()
+    logs_folder = os.path.join(logs_folder, 'ecm_logs')
+    if not os.path.isdir(logs_folder):
+        os.makedirs(logs_folder)
+
+    handler = RotatingFileHandler(
+        os.path.join(logs_folder, 'ecm.log'),
+        maxBytes=1 * 1024 * 1024,
+        backupCount=10,
+        encoding='UTF-8'
+    )
+
+    # 如果不是debug模式，则捕捉INFO以上的日志信息，默认NOTSET
+    if not app.config.get('DEBUG'):
+        handler.setLevel(logging.INFO)
+        app.logger.setLevel(logging.INFO)
+
+    logging_format = logging.Formatter(
+        '[%(asctime)s] [%(levelname)s] [%(message)s] [%(pathname)s:%(lineno)d]'
+    )
+    handler.setFormatter(logging_format)
+    app.logger.addHandler(handler)
+
+    return
+
+
+# 配置日志
+configure_logger(app)
+
+
+def logged(message, level=None):
+    def decorate(func):
+        msg = message if message else func.__name__
+        lev = level if level else logging.INFO
+
+        @functools.wraps(func)
+        def wrapper(*args, **kwargs):
+            app.logger.log(lev, msg)
+            return func(*args, **kwargs)
+
+        return wrapper
+
+    return decorate
+
+
 @app.route('/api/list_invetory', methods=['GET'])
+@logged("/api/list_invetory", level=logging.DEBUG)
 def list_invetory():
     try:
         result = os.listdir(INVENTORY_PATH)
